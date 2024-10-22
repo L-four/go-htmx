@@ -13,6 +13,7 @@ type responseWriterWrapper struct {
 	wroteHeaders bool
 }
 
+
 func (w *responseWriterWrapper) Write(data []byte) (int, error) {
 	w.writeHXHeader()
 	return w.ResponseWriter.Write(data)
@@ -21,6 +22,14 @@ func (w *responseWriterWrapper) Write(data []byte) (int, error) {
 func (w *responseWriterWrapper) WriteHeader(statusCode int) {
 	w.writeHXHeader()
 	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (w *responseWriterWrapper) Flush() {
+	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
+		flusher.Flush()
+	} else {
+		panic("Embed ResponseWriter does not implement http.Flusher interface")
+	}
 }
 
 func (w *responseWriterWrapper) writeHXHeader() {
