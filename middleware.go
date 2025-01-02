@@ -24,6 +24,18 @@ func (w *responseWriterWrapper) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
+var (
+	ErrWrappedIsNotHijacker = errors.New("go-htmx: upstream Response Writer doesn't implement http.Hijacker")
+)
+
+func (w *responseWriterWrapper) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if hijacker, ok := w.ResponseWriter.(http.Hijacker); ok {
+		return hijacker.Hijack()
+	} else {
+		return nil, nil, ErrWrappedIsNotHijacker
+	}
+}
+
 func (w *responseWriterWrapper) Flush() {
 	if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
 		flusher.Flush()
