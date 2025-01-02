@@ -3,6 +3,9 @@ package htmx
 import (
 	"context"
 	"net/http"
+	"net"
+	"bufio"
+	"errors"
 )
 
 type ctxKey struct{}
